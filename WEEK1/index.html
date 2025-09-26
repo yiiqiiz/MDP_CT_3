@@ -1,11 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>First webpage</title>
+  <link rel="stylesheet" href="style.css">
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Freesound Fetch Example</title>
 </head>
+
 <body>
-    <h1>First webpage</h1>
+  <nav class="topbar">
+    <!-- 修正：<img> 前不要有空格 -->
+    <img src="images/freesound.png" alt="Freesound logo">
+  </nav>
+
+  <header>
+    <h1>Pull a Random Sound!</h1>
+    <p class="subtitle">Get one from Freesound — fresh every click.</p>
+    <button id="fetch-button" aria-label="Fetch a random sound">Click here</button>
+  </header>
+
+  <main id="main-content"></main>
+
+<script>
+// ===== 配置 =====
+const FS_TOKEN = 'YOUR_FREESOUND_API_TOKEN'; // ←←← 换成你的 Freesound API Token
+const FS_BASE  = 'https://freesound.org/apiv2';
+
+// 一些常用的随机关键词，可自行增删
+const SEEDS = ['rain','bell','city','forest','wind','paper','knitting','ceramic','metro','bird','water','camera','typing','heartbeat'];
+
+const triggerButton = document.getElementById('fetch-button');
+const mainContent   = document.getElementById('main-content');
+
+triggerButton.addEventListener('click', () => {
+  mainContent.textContent = 'Loading...';
+
+  // 选一个随机关键词
+  const query = SEEDS[Math.floor(Math.random() * SEEDS.length)];
+
+  // 用关键词搜索 Freesound（限制 1–20s，带上我们需要的字段）
+  const url = new URL(FS_BASE + '/search/text/');
+  url.searchParams.set('query', query);
+  url.searchParams.set('page_size', '50');
+  url.searchParams.set('filter', 'duration:[1 TO 20]');
+  url.searchParams.set('fields', 'id,name,username,tags,duration,previews,url,license');
+
+  fetch(url, {
+    headers: { 'Authorization': `Token ${FS_TOKEN}` }
+  })
+  .then(res => {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  })
+  .then(data => {
+    const results = Array.isArray(data.results) ? data.results : [];
+    // 只挑有 mp3 预览的
+    const withPreview = results.filter(r => r.previews && (r.previews.preview_hq_mp3 || r.previews.preview_lq_mp3));
+    if (withPreview.length === 0) throw new Error('No previewable sounds found.');
+
+    const sound = withPreview[Math.floor(Math.random() * withPreview.length)];
+
+    const title   = sound.name || 'Untitled';
+    const author  = sound.username || 'unknown';
+    const tags    = (sound.tags || []).join(', ');
+    const seconds = typeof sound.duration === 'number' ? sound.duration.toFixed(2) : '—';
+    const srcMp3  = sound.previews.preview_hq_mp3 || sound.previews.preview_lq_mp3 || '';
+    const pageUrl = sound.url || '';
+    const license = sound.license || ''; // 例如 "http://creativecommons.org/licenses/by/3.0/"
+
+    const html = `
+      <h2>${escapeHtml(title)}</h2>
+      <audio controls ${srcMp3 ? `src="${srcMp3}"` : ''} aria-label="Preview audio: ${escapeHtml(title)}"></audio>
+      <p><strong>Source:</strong> <a href="${pageUrl}" target="_blank" rel="noreferrer">Freesound page</a></p>
+      ${license ? `<p><strong>License:</strong> <a href="${license}" target="_blank" rel="noreferrer">${license}</a></p>` : ''}
+      <p><strong>By:</strong> ${escapeHtml(author)}</p>
+      <p><strong>Duration:</strong> ${seconds} s</p>
+      <p><strong>Tags:</strong> ${escapeHtml(tags)}</p>
+      <hr />
+      <p style="opacity:.7">Keyword: <code>${escapeHtml(query)}</code></p>
+    `;
+    mainContent.innerHTML = html;
+
+    // 自动尝试播放（有些浏览器需要用户再次点击播放）
+    const player = mainContent.querySelector('audio');
+    player?.play?.().catch(()=>{ /* 忽略自动播放失败 */ });
+  })
+  .catch(err => {
+    mainContent.textContent = '加载失败：' + err.message;
+  });
+});
+
+// 简单的 HTML 转义，避免把标签原样插入
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, s => (
+    { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[s]
+  ));
+}
+</script>
+
 </body>
 </html>
