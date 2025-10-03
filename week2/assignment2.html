@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>iTunes → FreeSound: Random Linker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family: system-ui, -apple-system, Arial, sans-serif; margin:24px}
+    header{margin-bottom:16px}
+    button{padding:10px 14px; border-radius:10px; border:1px solid #333; cursor:pointer}
+    .row{display:grid; gap:16px; grid-template-columns:1fr; max-width:880px}
+    .card{border:1px solid #e5e5e5; border-radius:12px; padding:16px}
+    .meta{color:#666; font-size:14px}
+    img.cover{width:260px; height:auto; border-radius:8px}
+    audio{width:100%; margin-top:8px}
+    .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#f2f2f2; margin-left:6px; font-size:12px}
+    .grid{display:grid; grid-template-columns: 260px 1fr; gap:16px; align-items:start}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>iTunes → FreeSound</h1>
+    <p>Click the button to fetch a random iTunes song and a related FreeSound effect.</p>
+    <button id="fetch-button">Surprise me</button>
+  </header>
+
+  <main id="main" class="row"></main>
+
+  <script>
+    const main = document.getElementById('main');
+    const trigger = document.getElementById('fetch-button');
+
+    
+    const FREESOUND_API_KEY = "HGDEmJQhPz64WkX2IDRhoS8IeTLYAPRDCqzUOeP1";
+
+    // iTunes 
+    const ITUNES_SEEDS = [
+      "jazz","lofi","ambient","piano","guitar","electronic","rock","pop","hip hop",
+      "soundtrack","orchestra","folk","blues","house","techno","metal","synth","drum",
+      "cello","flute","trance","chill","indie","punk","rnb","latin","country","kpop",
+      "jpop","shoegaze","grunge","opera","dub","reggae","salsa","afrobeat","bolero",
+      "city","rain","ocean","forest","wind","thunder"
+    ];
+
+    // 小工具
+    const sample = arr => arr[Math.floor(Math.random() * arr.length)];
+    const shuffle = arr => arr.sort(() => Math.random() - 0.5);
+    const dedup = arr => [...new Set(arr)];
+    const normalize = s => (s || "").toLowerCase().replace(/[^a-z0-9 ]+/gi, " ").trim();
+    const interestingWords = (s) => {
+      const STOP = new Set(["the","a","an","and","or","to","of","in","on","for","with","ft","feat","remix","edit","mix","version","live"]);
+      return normalize(s).split(/\s+/).filter(w => w.length > 2 && !STOP.has(w));
+    };
+
+    // 1) 随机抓一首 iTunes 歌曲
+    async function fetchRandomITunesTrack() {
+      const term = sample(ITUNES_SEEDS);
+      const url = new URL("https://itunes.apple.com/search");
+      url.searchParams.set("term", term);
+      url.searchParams.set("media", "music");
+      url.searchParams.set("entity", "song");
+      url.searchParams.set("limit", "50");
+      url.searchParams.set("country", "US");
+
+      const resp = await fetch(url.toString());
+      if (!resp.ok) throw new Error(`iTunes API error: ${resp.status}`);
+      const data = await resp.json();
+      if (!data.results || data.results.length === 0) throw new Error("No songs from iTunes.");
+
+      return sample(data.results);
+    }
+
+    // 2) 基于歌曲构造 FreeSound 查询词，并搜索
+    async function fetchRelatedFreeSound(track) {
+      const wordsFromTitle = interestingWords(track.trackName || "");
+      const wordsFromArtist = interestingWords(track.artistName || "");
+      const genre = (track.primaryGenreName || "").toLowerCase();
+
+      // 候选查询：order [genre + title] → [title] → [genre] → [artist]
+      let queries = [];
+      if (genre) queries.push(`${genre} ${sample(wordsFromTitle) || ""}`.trim());
+      if (wordsFromTitle.length) queries.push(sample(wordsFromTitle));
+      if (genre) queries.push(genre);
+      if (wordsFromArtist.length) queries.push(sample(wordsFromArtist));
+
+      // 再补一个保底通用音效词
+      queries.push(sample(["whoosh","click","beep","drone","pad","hit","impact","swell","rain","wind","city","ocean","footstep"]));
+
+      // randomly
+      queries = shuffle(dedup(queries.filter(Boolean)));
+
+      // 逐个尝试，命中就返回
+      for (const q of queries) {
+        const sound = await searchFreeSoundOnce(q);
+        if (sound) return { sound, queryUsed: q };
+      }
+      return null;
+    }
+
+    async function searchFreeSoundOnce(query) {
+      const url = new URL("https://freesound.org/apiv2/search/text/");
+      url.searchParams.set("query", query);
+      url.searchParams.set("page_size", "40");
+      url.searchParams.set("fields", "id,name,previews,license,username,created,url");
+
+      const resp = await fetch(url.toString(), {
+        headers: { "Authorization": `Token ${FREESOUND_API_KEY}` }
+      });
+      if (!resp.ok) return null;
+
+      const data = await resp.json();
+      if (!data.results || data.results.length === 0) return null;
+
+      // 过滤掉没有预览的条目
+      const candidates = data.results.filter(s => s.previews && (s.previews["preview-hq-mp3"] || s.previews["preview-lq-mp3"] || s.previews["preview-hq-ogg"] || s.previews["preview-lq-ogg"]));
+      if (candidates.length === 0) return null;
+
+      return sample(candidates);
+    }
+
+    // 3) 渲染卡片
+    function renderTrack(track) {
+      const card = document.createElement("section");
+      card.className = "card";
+
+      // 放大封面：把 100x100 替换成 600x600
+      const art = (track.artworkUrl100 || "").replace("100x100bb.jpg", "600x600bb.jpg");
+
+      card.innerHTML = `
+        <h2>${track.trackName || "Unknown Title"}</h2>
+        <div class="grid">
+          <img class="cover" src="${art}" alt="${track.trackName || "cover"}" />
+          <div>
+            <p class="meta">
+              by <strong>${track.artistName || "Unknown Artist"}</strong>
+              ${track.primaryGenreName ? `<span class="pill">${track.primaryGenreName}</span>` : ""}
+            </p>
+            ${track.previewUrl ? `
+              <audio controls preload="none" src="${track.previewUrl}"></audio>
+              <p class="meta">iTunes preview</p>
+            ` : `<p class="meta">No iTunes preview.</p>`}
+            <p><a href="${track.trackViewUrl || "#"}" target="_blank" rel="noopener noreferrer">Open on iTunes</a></p>
+          </div>
+        </div>
+      `;
+      // 新内容靠前
+      main.prepend(card);
+      return card;
+    }
+
+    function renderSound(result, queryUsed) {
+      const { sound } = result;
+      const card = document.createElement("section");
+      card.className = "card";
+
+      const previewMp3 = sound.previews?.["preview-hq-mp3"] || sound.previews?.["preview-lq-mp3"] || null;
+      const previewOgg = sound.previews?.["preview-hq-ogg"] || sound.previews?.["preview-lq-ogg"] || null;
+
+      card.innerHTML = `
+        <h3>Matched SFX from FreeSound</h3>
+        <p class="meta">Query used: <code>${queryUsed}</code></p>
+        <p><strong>${sound.name || ("Sound #" + sound.id)}</strong> by ${sound.username || "Unknown"}</p>
+        ${ (previewMp3 || previewOgg)
+          ? `<audio controls preload="none">
+               ${previewMp3 ? `<source src="${previewMp3}" type="audio/mpeg">` : ""}
+               ${previewOgg ? `<source src="${previewOgg}" type="audio/ogg">` : ""}
+               Your browser does not support the audio element.
+             </audio>`
+          : `<p>No preview available.</p>`
+        }
+        <p class="meta">License: ${sound.license || "See FreeSound page"}</p>
+        <p><a href="${sound.url || `https://freesound.org/s/${sound.id}/`}" target="_blank" rel="noopener noreferrer">Open on FreeSound</a></p>
+      `;
+      main.prepend(card);
+    }
+
+    function renderError(err) {
+  const card = document.createElement("section");
+  card.className = "card";
+  card.innerHTML = `
+    <h3>Oops, something went wrong</h3>
+    <p class="meta">${String(err)}</p>
+    <p>Tip: Check your network connection, API Key, or try again later.</p>
+  `;
+  main.prepend(card);
+}
+
+// 4) Bind button
+trigger.addEventListener("click", async () => {
+  trigger.disabled = true;
+  trigger.textContent = "Fetching...";
+
+  try {
+    // 1: Randomly fetch a song
+    const track = await fetchRandomITunesTrack();
+    renderTrack(track);
+
+    // 2: Use song info to fetch FreeSound effect
+    const related = await fetchRelatedFreeSound(track);
+    if (related) {
+      renderSound(related, related.queryUsed);
+    } else {
+      renderError("No related sound found (tried multiple keywords).");
+    }
+  } catch (e) {
+    console.error(e);
+    renderError(e);
+  } finally {
+    trigger.disabled = false;
+    trigger.textContent = "Surprise me";
+  }
+});
+  </script>
+</body>
+</html>

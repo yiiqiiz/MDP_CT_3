@@ -95,7 +95,6 @@ function renderTrack(track, keyword){
   const ms     = track.trackTimeMillis || 0;
   const secs   = ms ? Math.round(ms/1000) : null;
   const art100 = track.artworkUrl100 || '';
-  // 试着把 100x100 换更清晰封面（Apple 常见规则）
   const art600 = art100 ? art100.replace('100x100bb', '600x600bb') : '';
   const preview= track.previewUrl || '';
   const source = track.trackViewUrl || track.collectionViewUrl || '';

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FreeSound Random Preview</title>
+  <style>
+    body{font-family: system-ui, -apple-system, Arial, sans-serif; margin: 24px;}
+    header{margin-bottom: 16px;}
+    img{max-width: 320px; display:block; margin: 8px 0;}
+    .card{border:1px solid #ddd; border-radius:12px; padding:16px; margin-top:12px;}
+    button{padding:10px 14px; border-radius:10px; border:1px solid #333; cursor:pointer;}
+    .meta{font-size:14px; color:#555;}
+    audio{width:100%; margin-top:8px;}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FreeSound Random SFX</h1>
+    <h3>Click to fetch a random sound</h3>
+    <button id="fetch-button">Fetch data</button>
+  </header>
+
+  <main id="main-content"></main>
+
+  <script>
+    const mainContent = document.getElementById('main-content');
+    const triggerButton = document.getElementById('fetch-button');
+
+    // ⚠️ 生产环境不要把 key 放在前端。这里只为演示。
+    const FREESOUND_API_KEY = "HGDEmJQhPz64WkX2IDRhoS8IeTLYAPRDCqzUOeP1";
+
+    // 随机关键词池（可自行扩展/修改）
+    const SEEDS = [
+      "click","beep","whoosh","wind","rain","thunder","water","bird","dog",
+      "cat","footstep","keyboard","bell","drum","piano","violin","ambient",
+      "machine","city","ocean","wave","metal","paper","wood","glass","noise",
+      "air","engine","bubbles","swish","snap","pop","crackle","river","forest",
+      "insect","door","slam","squeak","laser","sci-fi","electric","heartbeat","clock"
+    ];
+
+    // 从数组中随机抽一个元素
+    function sample(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    // 获取随机音效（使用 FreeSound 搜索 + 随机挑一个返回项）
+    async function fetchRandomFreeSound() {
+      // 1) 随机选择关键词
+      const term = sample(SEEDS);
+
+      // 2) 向 FreeSound 搜索接口请求（page_size 可调大点以便更随机）
+      const url = new URL("https://freesound.org/apiv2/search/text/");
+      url.searchParams.set("query", term);
+      url.searchParams.set("page_size", "50");
+      // 选择需要的字段，减少传输体积
+      url.searchParams.set("fields", "id,name,previews,license,username,created,url");
+
+      const resp = await fetch(url.toString(), {
+        headers: {
+          "Authorization": `Token ${FREESOUND_API_KEY}`
+        }
+      });
+
+      if (!resp.ok) {
+        throw new Error(`FreeSound API error: ${resp.status} ${resp.statusText}`);
+      }
+
+      const data = await resp.json();
+      if (!data.results || data.results.length === 0) {
+        throw new Error("No results from FreeSound for query: " + term);
+      }
+
+      // 3) 在本次返回结果里随机一条
+      const sound = sample(data.results);
+      return sound;
+    }
+
+    // 渲染音效卡片
+    function renderSound(sound) {
+      // 优先用 HQ mp3 预览，其次 LQ
+      const previewMp3 =
+        (sound.previews && (sound.previews["preview-hq-mp3"] || sound.previews["preview-lq-mp3"])) || null;
+      const previewOgg =
+        (sound.previews && (sound.previews["preview-hq-ogg"] || sound.previews["preview-lq-ogg"])) || null;
+
+      const title = sound.name || `Sound #${sound.id}`;
+      const author = sound.username || "Unknown";
+      const created = sound.created ? new Date(sound.created).toLocaleString() : "";
+      const pageUrl = sound.url || `https://freesound.org/s/${sound.id}/`;
+
+      const audioHTML = previewMp3 || previewOgg
+        ? `
+          <audio controls preload="none">
+            ${previewMp3 ? `<source src="${previewMp3}" type="audio/mpeg">` : ""}
+            ${previewOgg ? `<source src="${previewOgg}" type="audio/ogg">` : ""}
+            Your browser does not support the audio element.
+          </audio>
+        `
+        : `<p>No preview available for this sound.</p>`;
+
+      const card = document.createElement("section");
+      card.className = "card";
+      card.innerHTML = `
+        <h2>${title}</h2>
+        <p class="meta">By <strong>${author}</strong> · ${created}</p>
+        ${audioHTML}
+        <p class="meta">License: ${sound.license || "See FreeSound page"}</p>
+        <p><a href="${pageUrl}" target="_blank" rel="noopener noreferrer">Open on FreeSound</a></p>
+      `;
+
+      // 展示在最上方（新内容靠前）
+      mainContent.prepend(card);
+    }
+
+    async function onFetchClick() {
+      triggerButton.disabled = true;
+      triggerButton.textContent = "Fetching...";
+      try {
+        const sound = await fetchRandomFreeSound();
+        renderSound(sound);
+      } catch (err) {
+        console.error(err);
+        const errorCard = document.createElement("section");
+        errorCard.className = "card";
+        errorCard.innerHTML = `
+          <h2>Failed to fetch sound</h2>
+          <p class="meta">${String(err)}</p>
+          <p>Tips: 检查网络、API Key 是否有效、或稍后重试。</p>
+        `;
+        mainContent.prepend(errorCard);
+      } finally {
+        triggerButton.disabled = false;
+        triggerButton.textContent = "Fetch data";
+      }
+    }
+
+    triggerButton.addEventListener("click", onFetchClick);
+  </script>
+</body>
+</html>
