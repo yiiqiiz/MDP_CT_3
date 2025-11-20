@@ -15,6 +15,7 @@
     audio{width:100%; margin-top:8px}
     .pill{display:inline-block; padding:2px 8px; border-radius:999px; background:#f2f2f2; margin-left:6px; font-size:12px}
     .grid{display:grid; grid-template-columns: 260px 1fr; gap:16px; align-items:start}
+    @media (max-width:640px){ .grid{grid-template-columns:1fr} .cover{width:100%} }
   </style>
 </head>
 <body>
@@ -30,10 +31,10 @@
     const main = document.getElementById('main');
     const trigger = document.getElementById('fetch-button');
 
-    
+    // ⚠️ FreeSound API key (front-end demo only, unsafe in production!)
     const FREESOUND_API_KEY = "HGDEmJQhPz64WkX2IDRhoS8IeTLYAPRDCqzUOeP1";
 
-    // iTunes 
+    // Random seed keywords for iTunes
     const ITUNES_SEEDS = [
       "jazz","lofi","ambient","piano","guitar","electronic","rock","pop","hip hop",
       "soundtrack","orchestra","folk","blues","house","techno","metal","synth","drum",
@@ -42,7 +43,7 @@
       "city","rain","ocean","forest","wind","thunder"
     ];
 
-    // 小工具
+    // Helpers
     const sample = arr => arr[Math.floor(Math.random() * arr.length)];
     const shuffle = arr => arr.sort(() => Math.random() - 0.5);
     const dedup = arr => [...new Set(arr)];
@@ -52,7 +53,7 @@
       return normalize(s).split(/\s+/).filter(w => w.length > 2 && !STOP.has(w));
     };
 
-    // 1) 随机抓一首 iTunes 歌曲
+    // 1) Fetch random iTunes song
     async function fetchRandomITunesTrack() {
       const term = sample(ITUNES_SEEDS);
       const url = new URL("https://itunes.apple.com/search");
@@ -65,34 +66,46 @@
       const resp = await fetch(url.toString());
       if (!resp.ok) throw new Error(`iTunes API error: ${resp.status}`);
       const data = await resp.json();
-      if (!data.results || data.results.length === 0) throw new Error("No songs from iTunes.");
 
+      // Debug log
+      console.group("iTunes API");
+      console.log("Query term:", term);
+      console.log("Raw data:", data);
+      console.groupEnd();
+
+      if (!data.results || data.results.length === 0) throw new Error("No songs from iTunes.");
       return sample(data.results);
     }
 
-    // 2) 基于歌曲构造 FreeSound 查询词，并搜索
+    // 2) Build queries from song info, search FreeSound
     async function fetchRelatedFreeSound(track) {
       const wordsFromTitle = interestingWords(track.trackName || "");
       const wordsFromArtist = interestingWords(track.artistName || "");
       const genre = (track.primaryGenreName || "").toLowerCase();
 
-      // 候选查询：order [genre + title] → [title] → [genre] → [artist]
       let queries = [];
       if (genre) queries.push(`${genre} ${sample(wordsFromTitle) || ""}`.trim());
       if (wordsFromTitle.length) queries.push(sample(wordsFromTitle));
       if (genre) queries.push(genre);
       if (wordsFromArtist.length) queries.push(sample(wordsFromArtist));
-
-      // 保底通用音效词
       queries.push(sample(["whoosh","click","beep","drone","pad","hit","impact","swell","rain","wind","city","ocean","footstep"]));
 
-      // randomly
       queries = shuffle(dedup(queries.filter(Boolean)));
 
-      // 逐个尝试，命中就返回
+      // 🔍 Debug log
+      console.group(" FreeSound Query Candidates");
+      console.log("From title:", wordsFromTitle);
+      console.log("From artist:", wordsFromArtist);
+      console.log("Genre:", genre);
+      console.log("Candidates:", queries);
+      console.groupEnd();
+
       for (const q of queries) {
         const sound = await searchFreeSoundOnce(q);
-        if (sound) return { sound, queryUsed: q };
+        if (sound) {
+          console.log(" FreeSound query used:", q, "→ Result:", sound);
+          return { sound, queryUsed: q };
+        }
       }
       return null;
     }
@@ -109,21 +122,28 @@
       if (!resp.ok) return null;
 
       const data = await resp.json();
-      if (!data.results || data.results.length === 0) return null;
 
-      // 过滤掉没有预览的条目
-      const candidates = data.results.filter(s => s.previews && (s.previews["preview-hq-mp3"] || s.previews["preview-lq-mp3"] || s.previews["preview-hq-ogg"] || s.previews["preview-lq-ogg"]));
+      // 🔍 Debug log
+      console.group("FreeSound API");
+      console.log("Query:", query);
+      console.log("Raw data:", data);
+      console.groupEnd();
+
+      if (!data.results || data.results.length === 0) return null;
+      const candidates = data.results.filter(s =>
+        s.previews && (s.previews["preview-hq-mp3"] || s.previews["preview-lq-mp3"] ||
+                       s.previews["preview-hq-ogg"] || s.previews["preview-lq-ogg"])
+      );
       if (candidates.length === 0) return null;
 
       return sample(candidates);
     }
 
-    // 3) 渲染卡片
+    // 3) Render Song Card
     function renderTrack(track) {
       const card = document.createElement("section");
       card.className = "card";
 
-      // 放大封面：把 100x100 替换成 600x600
       const art = (track.artworkUrl100 || "").replace("100x100bb.jpg", "600x600bb.jpg");
 
       card.innerHTML = `
@@ -143,11 +163,11 @@
           </div>
         </div>
       `;
-      // 新内容靠前
       main.prepend(card);
       return card;
     }
 
+    // 3b) Render Sound Card
     function renderSound(result, queryUsed) {
       const { sound } = result;
       const card = document.createElement("section");
@@ -160,56 +180,54 @@
         <h3>Matched SFX from FreeSound</h3>
         <p class="meta">Query used: <code>${queryUsed}</code></p>
         <p><strong>${sound.name || ("Sound #" + sound.id)}</strong> by ${sound.username || "Unknown"}</p>
-        ${ (previewMp3 || previewOgg)
+        ${(previewMp3 || previewOgg)
           ? `<audio controls preload="none">
                ${previewMp3 ? `<source src="${previewMp3}" type="audio/mpeg">` : ""}
                ${previewOgg ? `<source src="${previewOgg}" type="audio/ogg">` : ""}
                Your browser does not support the audio element.
              </audio>`
-          : `<p>No preview available.</p>`
-        }
+          : `<p>No preview available.</p>`}
         <p class="meta">License: ${sound.license || "See FreeSound page"}</p>
         <p><a href="${sound.url || `https://freesound.org/s/${sound.id}/`}" target="_blank" rel="noopener noreferrer">Open on FreeSound</a></p>
       `;
       main.prepend(card);
     }
 
+    // Error card
     function renderError(err) {
-  const card = document.createElement("section");
-  card.className = "card";
-  card.innerHTML = `
-    <h3>Oops, something went wrong</h3>
-    <p class="meta">${String(err)}</p>
-    <p>Tip: Check your network connection, API Key, or try again later.</p>
-  `;
-  main.prepend(card);
-}
-
-// 4) 绑定按钮
-trigger.addEventListener("click", async () => {
-  trigger.disabled = true;
-  trigger.textContent = "Fetching...";
-
-  try {
-    // 1: Randomly fetch a song
-    const track = await fetchRandomITunesTrack();
-    renderTrack(track);
-
-    // 2: Use song info to fetch FreeSound effect
-    const related = await fetchRelatedFreeSound(track);
-    if (related) {
-      renderSound(related, related.queryUsed);
-    } else {
-      renderError("No related sound found (tried multiple keywords).");
+      const card = document.createElement("section");
+      card.className = "card";
+      card.innerHTML = `
+        <h3>Oops, something went wrong</h3>
+        <p class="meta">${String(err)}</p>
+        <p>Tip: Check your network connection, API Key, or try again later.</p>
+      `;
+      main.prepend(card);
     }
-  } catch (e) {
-    console.error(e);
-    renderError(e);
-  } finally {
-    trigger.disabled = false;
-    trigger.textContent = "Surprise me";
-  }
-});
+
+    // 4) Button binding
+    trigger.addEventListener("click", async () => {
+      trigger.disabled = true;
+      trigger.textContent = "Fetching...";
+
+      try {
+        const track = await fetchRandomITunesTrack();
+        renderTrack(track);
+
+        const related = await fetchRelatedFreeSound(track);
+        if (related) {
+          renderSound(related, related.queryUsed);
+        } else {
+          renderError("No related sound found (tried multiple keywords).");
+        }
+      } catch (e) {
+        console.error(e);
+        renderError(e);
+      } finally {
+        trigger.disabled = false;
+        trigger.textContent = "Surprise me";
+      }
+    });
   </script>
 </body>
 </html>

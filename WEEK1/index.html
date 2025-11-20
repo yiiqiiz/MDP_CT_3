@@ -38,7 +38,7 @@
 const mainContent   = document.getElementById('main-content');
 const triggerButton = document.getElementById('fetch-button');
 
-// 常见关键词，确保大概率有预览
+// 常见关键词keywords
 const SEEDS = [
   "jazz","lofi","ambient","piano","guitar","string quartet","electronic",
   "hip hop","rock","pop","RnB","synth","orchestra","folk","blues","house",
@@ -50,7 +50,7 @@ triggerButton.addEventListener('click', () => {
   fetchRandomTrackWithRetry(0);
 });
 
-// 最多重试 6 次，直到拿到带 previewUrl 的结果
+// 最多重试 6 次
 async function fetchRandomTrackWithRetry(attempt){
   if (attempt >= 6){
     mainContent.textContent = '加载失败：Tried 6 times, no previewable track.';
