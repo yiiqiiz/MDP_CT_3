@@ -31,7 +31,6 @@
                     <li><a href="#concept"><span>Concept</span><small>01</small></a></li>
                     <li><a href="#process"><span>Process</span><small>02</small></a></li>
                     <li><a href="#result"><span>Result</span><small>03</small></a></li>
-                    <li><a href="#reflection"><span>Reflection</span><small>04</small></a></li>
                     <li><a href="homepage.html"><span>← Back Home</span><small>↩</small></a></li>
                 </ul>
             </aside>
@@ -169,54 +168,112 @@ ${source ? `&lt;a href="\${source}" target="_blank"&gt;iTunes/Apple Music page&l
                         <img src="01/test1.png" alt="System diagram">
                     </figure>
 
+                    <p class="p">
+                        After learning how to obtain and use an API key, and in response to the assignment requirement
+                        to connect two APIs, I linked the iTunes Search API with the Freesound API. Information
+                        retrieved from a randomly selected song—such as its title or genre—is used as input to query
+                        Freesound, which returns a related but unpredictable sound effect. This process allows data from
+                        one system to trigger a second system, forming a chained interaction.
+                    </p>
 
 
+                    <figure class="figure">
+                        <img src="01/apikey.png" alt="System diagram">
+                    </figure>
 
+                    <pre class="code-block"><code>
+const track = await fetchRandomITunesTrack();
+renderTrack(track);
 
+const related = await fetchRelatedFreeSound(track);
+if (related) {
+  renderSound(related, related.queryUsed);
+} else {
+  renderError("No related sound found (tried multiple keywords).");
+}
 
+</code></pre>
+
+                    <p class="p">
+                        This code represents the core Rube Goldberg–style chain of the project. Data retrieved from the
+                        iTunes API is not treated as a final result, but instead becomes the input for a second system.
+                        The selected song directly informs the FreeSound query, demonstrating a clear API-chaining
+                        structure in which one API response triggers another.
+                    </p>
+
+                    <pre class="code-block"><code>
+const wordsFromTitle  = interestingWords(track.trackName || "");
+const wordsFromArtist = interestingWords(track.artistName || "");
+const genre = (track.primaryGenreName || "").toLowerCase();
+
+let queries = [];
+if (genre) queries.push(`${genre} ${sample(wordsFromTitle) || ""}`.trim());
+if (wordsFromTitle.length) queries.push(sample(wordsFromTitle));
+if (genre) queries.push(genre);
+if (wordsFromArtist.length) queries.push(sample(wordsFromArtist));
+
+queries.push(sample(["whoosh","click","beep","drone","pad","hit","impact","swell",
+"rain","wind","city","ocean","footstep"]));
+queries = shuffle(dedup(queries.filter(Boolean)));
+</code></pre>
+
+                    <p class="p">
+                        This part of the code functions as a translation mechanism, converting music metadata, such as
+                        song title, artist name, and genre, into meaningful search queries for the FreeSound API. Rather
+                        than performing a random search, the system follows a structured strategy with multiple fallback
+                        options, ensuring that the generated sound queries remain contextually related while still
+                        allowing for unpredictability.
+                    </p>
+
+                    <pre class="code-block"><code>
+const url = new URL("https://freesound.org/apiv2/search/text/");
+url.searchParams.set("query", query);
+url.searchParams.set("page_size", "40");
+url.searchParams.set("fields", "id,name,previews,license,username,created,url");
+
+const resp = await fetch(url.toString(), {
+  headers: { "Authorization": `Token ${FREESOUND_API_KEY}` }
+});
+const data = await resp.json();
+</code></pre>
+
+                    <p class="p">
+                        This section handles the second API request, using an authenticated call with an API key to
+                        access the FreeSound database. The request specifies selected fields to reduce unnecessary data
+                        and filters the results to include only sounds with playable previews, ensuring that the
+                        returned data can be directly translated into an audible output.
+                    </p>
+
+                    <pre class="code-block"><code>
+for (const q of queries) {
+  const sound = await searchFreeSoundOnce(q);
+  if (sound) return { sound, queryUsed: q };
+}
+return null;
+</code></pre>
+
+                    <p class="p">
+                        This section implements a multi-path search strategy, allowing the system to attempt multiple
+                        queries rather than stopping at the first failure. By iterating through different keyword
+                        combinations and fallback options, the machine continues exploring until a valid sound is found,
+                        reinforcing the idea of a chained, self-adjusting system rather than a single linear action.
+                    </p>
                 </section>
 
                 <!-- Result -->
                 <section class="section" id="result">
                     <h2 class="h2">Result</h2>
                     <p class="p">
-                        这里放最终效果：可以是一张 hero 图、一个演示视频、或 GIF。
+                        This video shows a successful connection test of the Arduino system, demonstrating basic sensor
+                        input and system response before final integration.
                     </p>
 
-                    <div class="mediaGrid">
-                        <figure class="figure">
-                            <img src="assets/a1/final01.jpg" alt="Final result">
-                            <figcaption class="caption">最终效果（截图 / 渲染 / 现场照片）。</figcaption>
-                        </figure>
+                    <figure class="figure">
+                        <iframe src="https://www.youtube.com/embed/TreKEsT2AOI"
+                            title="WWW as a Rube Goldberg machine" allowfullscreen>
+                        </iframe>
 
-                        <figure class="figure">
-                            <!-- 如果你是视频：把 img 换成 video -->
-                            <video controls src="assets/a1/demo.mp4"></video>
-                            <figcaption class="caption">Demo video（可选）。</figcaption>
-                        </figure>
-                    </div>
-                </section>
-
-                <!-- Reflection -->
-                <section class="section" id="reflection">
-                    <h2 class="h2">Reflection</h2>
-                    <p class="p">
-                        写 3-6 条反思：什么有效？什么无效？如果有更多时间你会怎么做？
-                    </p>
-                </section>
-
-                <!-- Links -->
-                <section class="section" id="links">
-                    <h2 class="h2">Links</h2>
-                    <p class="p">
-                        <a class="link" href="https://github.com/yourname/yourrepo" target="_blank"
-                            rel="noopener">GitHub Repo</a>
-                        ·
-                        <a class="link" href="https://editor.p5js.org/yourname/sketches/xxxx" target="_blank"
-                            rel="noopener">p5.js Sketch</a>
-                    </p>
-                </section>
-
+                    
             </main>
         </div>
 
