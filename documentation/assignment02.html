@@ -137,140 +137,60 @@ while (spawnAcc >= 1.0) spawnCar();
                     </p>
 
                     <pre class="code-block"><code>
-const url = new URL('https://itunes.apple.com/search');
-url.searchParams.set('term', term);
-url.searchParams.set('media','music');
-url.searchParams.set('entity','musicTrack');
-url.searchParams.set('limit','50');
-url.searchParams.set('country','US');
-
-const res = await fetch(url.toString());
-const data = await res.json();
+drawRoads()
+circle(c.x, c.y, 6);
+HUD counters
 </code></pre>
 
                     <p class="p">
-
-                        The selected keyword is converted into a structured API request URL, sent to the server via a
-                        fetch call, and parsed from the returned JSON data for further processing.
-                    </p>
-
-                    <pre class="code-block"><code>
-${preview ? `&lt;audio controls src="\${preview}" type="audio/m4a"&gt;&lt;/audio&gt;` : ''}
-${source ? `&lt;a href="\${source}" target="_blank"&gt;iTunes/Apple Music page&lt;/a&gt;` : ''}
-</code></pre>
-
-                    <p class="p">
-
-                        The API response is translated from structured JSON data into visual text and playable sound,
-                        turning metadata into an interactive audiovisual interface.
+                        Cars are abstracted into colored points and roads into minimal linear paths, accompanied by a
+                        HUD that displays live system metrics. By avoiding visual realism, the simulation foregrounds
+                        behavior and performance over representation, encouraging the viewer to read the system
+                        analytically rather than narratively, with data functioning as an integral part of the visual
+                        language.
                     </p>
 
                     <figure class="figure">
-                        <img src="01/test1.png" alt="System diagram">
+                        <img src="02/2.png" alt="System diagram">
                     </figure>
-
-                    <p class="p">
-                        After learning how to obtain and use an API key, and in response to the assignment requirement
-                        to connect two APIs, I linked the iTunes Search API with the Freesound API. Information
-                        retrieved from a randomly selected song—such as its title or genre—is used as input to query
-                        Freesound, which returns a related but unpredictable sound effect. This process allows data from
-                        one system to trigger a second system, forming a chained interaction.
-                    </p>
-
 
                     <figure class="figure">
-                        <img src="01/apikey.png" alt="System diagram">
+                        <img src="02/3.png" alt="System diagram">
                     </figure>
 
+
+
+
                     <pre class="code-block"><code>
-const track = await fetchRandomITunesTrack();
-renderTrack(track);
-
-const related = await fetchRelatedFreeSound(track);
-if (related) {
-  renderSound(related, related.queryUsed);
-} else {
-  renderError("No related sound found (tried multiple keywords).");
-}
-
+spawnAcc += (deltaTime/1000) * spawnPerSec;
+while (spawnAcc >= 1.0) spawnCar();
 </code></pre>
 
                     <p class="p">
-                        This code represents the core Rube Goldberg–style chain of the project. Data retrieved from the
-                        iTunes API is not treated as a final result, but instead becomes the input for a second system.
-                        The selected song directly informs the FreeSound query, demonstrating a clear API-chaining
-                        structure in which one API response triggers another.
+                        Vehicle spawning is driven by real time rather than frame count, allowing density to accumulate
+                        gradually instead of appearing instantly. This temporal buildup frames densification as
+                        sustained pressure within the system, emphasizing density as an unfolding process rather than a
+                        fixed state.
                     </p>
 
-                    <pre class="code-block"><code>
-const wordsFromTitle  = interestingWords(track.trackName || "");
-const wordsFromArtist = interestingWords(track.artistName || "");
-const genre = (track.primaryGenreName || "").toLowerCase();
+                    <figure class="figure">
+                        <img src="02/4.png" alt="System diagram">
+                    </figure>
 
-let queries = [];
-if (genre) queries.push(`${genre} ${sample(wordsFromTitle) || ""}`.trim());
-if (wordsFromTitle.length) queries.push(sample(wordsFromTitle));
-if (genre) queries.push(genre);
-if (wordsFromArtist.length) queries.push(sample(wordsFromArtist));
-
-queries.push(sample(["whoosh","click","beep","drone","pad","hit","impact","swell",
-"rain","wind","city","ocean","footstep"]));
-queries = shuffle(dedup(queries.filter(Boolean)));
-</code></pre>
-
-                    <p class="p">
-                        This part of the code functions as a translation mechanism, converting music metadata, such as
-                        song title, artist name, and genre, into meaningful search queries for the FreeSound API. Rather
-                        than performing a random search, the system follows a structured strategy with multiple fallback
-                        options, ensuring that the generated sound queries remain contextually related while still
-                        allowing for unpredictability.
-                    </p>
-
-                    <pre class="code-block"><code>
-const url = new URL("https://freesound.org/apiv2/search/text/");
-url.searchParams.set("query", query);
-url.searchParams.set("page_size", "40");
-url.searchParams.set("fields", "id,name,previews,license,username,created,url");
-
-const resp = await fetch(url.toString(), {
-  headers: { "Authorization": `Token ${FREESOUND_API_KEY}` }
-});
-const data = await resp.json();
-</code></pre>
-
-                    <p class="p">
-                        This section handles the second API request, using an authenticated call with an API key to
-                        access the FreeSound database. The request specifies selected fields to reduce unnecessary data
-                        and filters the results to include only sounds with playable previews, ensuring that the
-                        returned data can be directly translated into an audible output.
-                    </p>
-
-                    <pre class="code-block"><code>
-for (const q of queries) {
-  const sound = await searchFreeSoundOnce(q);
-  if (sound) return { sound, queryUsed: q };
-}
-return null;
-</code></pre>
-
-                    <p class="p">
-                        This section implements a multi-path search strategy, allowing the system to attempt multiple
-                        queries rather than stopping at the first failure. By iterating through different keyword
-                        combinations and fallback options, the machine continues exploring until a valid sound is found,
-                        reinforcing the idea of a chained, self-adjusting system rather than a single linear action.
-                    </p>
                 </section>
 
                 <!-- Result -->
                 <section class="section" id="result">
                     <h2 class="h2">Result</h2>
                     <p class="p">
-                        This video shows a successful connection test of the Arduino system, demonstrating basic sensor
-                        input and system response before final integration.
+                        The final video documents the simulation in motion, capturing how density accumulates over time
+                        and how congestion emerges from simple rules and repeated interactions. Rather than presenting a
+                        fixed outcome, the footage highlights moments of buildup, friction, and slowdown, allowing
+                        densifying to be read as a dynamic process enacted by the system itself.
                     </p>
 
                     <figure class="figure">
-                        <iframe src="https://www.youtube.com/embed/TreKEsT2AOI" title="WWW as a Rube Goldberg machine"
+                        <iframe src="https://www.youtube.com/embed/hhB3jmcmGp8" title="Simulation and Design"
                             allowfullscreen>
                         </iframe>
 
