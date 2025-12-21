@@ -112,44 +112,73 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord){
                             <img src="05/02.png" alt="System diagram">
                         </figure>
 
+                        <figure class="figure">
+                            <iframe src="https://www.youtube.com/embed/O5LyDisSB3U" title="Shadertoy" allowfullscreen>
+                            </iframe>
+
+                            <pre class="code-block"><code>
+float low = fftSample(0.03);
+float mid = fftSample(0.12);
+float amp = 0.15 + 0.85*low;
+</code></pre>
+
+                            <pre class="code-block"><code>
+float r = length(p - c);
+
+float k = mix(18.0, 45.0, mid);
+float w = mix(2.0,  6.0,  low);
+
+float ripple = sin(k*r - w*iTime);
+float decay = exp(-r*2.2);
+float height = ripple * decay * amp;
+</code></pre>
+
+                            <h2 class="h2">#3</h2>
+                            <figure class="figure">
+                                <img src="05/03.png" alt="System diagram">
+                            </figure>
+
+                            <figure class="figure">
+                                <iframe src="https://www.youtube.com/embed/SsUm69c-l-Y" title="Shadertoy"
+                                    allowfullscreen>
+                                </iframe>
+
+                                <pre class="code-block"><code>
+float grooveFreq = mix(60.0, 140.0, mid);
+    float wobble = (waveSample(r*1.5 + iTime*0.02) - 0.5) * (0.25 + 0.35*low);
+    float rings = sin(grooveFreq*(r + wobble));
+</code></pre>
 
 
+                                <h2 class="h2">#4</h2>
+                                <figure class="figure">
+                                    <img src="05/04.png" alt="System diagram">
+                                </figure>
+
+                                <figure class="figure">
+                                    <iframe src="https://www.youtube.com/embed/SsUm69c-l-Y" title="Shadertoy"
+                                        allowfullscreen>
+                                    </iframe>
 
 
+                                    <pre class="code-block"><code>
+float flowSpeed = mix(0.08, 0.28, low);
+float viscous   = mix(0.20, 0.75, 1.0-mid);
+float rippleFreq= mix(14.0, 40.0, mid);
+float warpAmp   = mix(0.010, 0.050, low);
+</code></pre>
 
+<h2 class="h2">#5</h2>
+                                <figure class="figure">
+                                    <img src="05/05.png" alt="System diagram">
+                                </figure>
 
+                                <figure class="figure">
+                                    <iframe src="https://www.youtube.com/embed/SsUm69c-l-Y" title="Shadertoy"
+                                        allowfullscreen>
+                                    </iframe>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        <p class="p">
-                            I was responsible for the weight-sensing system in the project. When I received the weight
-                            sensor, I found that it required a load cell amplifier (HX711) to function properly. Before
-                            any
-                            testing could take place, I first soldered the load cell wires to the HX711 amplifier,
-                            ensuring
-                            stable electrical connections. This step allowed the raw analog signals from the load cell
-                            to be
-                            amplified and read by the microcontroller, forming the foundation for weight detection and
-                            data
-                            transmission in the system.
-                        </p>
-
+                                    
 
 
 
