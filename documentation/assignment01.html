@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <link href="https://fonts.googleapis.com/css2?family=Codystar:wght@300;400&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Assignment 03 · Creative Technology 03</title>
+    <title>Assignment 01 · Creative Technology 03</title>
     <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -62,35 +62,118 @@
                 <!-- Concept -->
                 <section class="section" id="concept">
                     <h2 class="h2">Concept</h2>
+                    <figure class="figure">
+                        <img src="01/rubegoldbergmachine.png" alt="System diagram">
+                    </figure>
+
                     <p class="p">
-                        写你的概念/问题意识：你观察到了什么现象？你想让观众体验到什么？
+                        A Rube Goldberg machine is a deliberately overcomplicated system designed to perform a simple
+                        task through a long chain of interconnected actions. Each step in the system triggers the next,
+                        often using basic physical principles such as gravity, motion, or cause-and-effect. Originally
+                        popularized by the cartoonist Rube Goldberg, these machines function as humorous and critical
+                        commentaries on human ingenuity, technological excess, and the tendency to over-engineer
+                        solutions. In contemporary contexts, the concept of the Rube Goldberg machine is often used as a
+                        metaphor for complex digital systems, where a single user action can initiate multiple hidden
+                        processes across networks, servers, and platforms.
                     </p>
                 </section>
 
                 <!-- Process -->
                 <section class="section" id="process">
                     <h2 class="h2">Process</h2>
+
+
                     <p class="p">
-                        写制作过程（可以用小段落）。如果你想用列表，也可以直接写多个 &lt;p&gt;。
+                        At the beginning of the project, I intended to use the Freesound API as my primary data source.
+                        Because my thesis focuses on sound, I was interested in retrieving audio samples based on
+                        keywords or visual input (such as images) in order to explore how sound can be generated or
+                        associated through semantic or contextual metadata. However, at that stage, I was not yet
+                        familiar with how to properly use API keys and authentication, which made it difficult to
+                        implement Freesound within the limited timeframe of the assignment.
+
+                        As a result, I shifted to using the iTunes Search API as an alternative. The iTunes API allowed
+                        me to fetch music data without authentication, making it more accessible for rapid prototyping.
+                        When the user triggers the fetch action, the system randomly selects a song from the API
+                        results. Each retrieved track includes structured information such as the song title, genre,
+                        duration, album name, and a direct link to its iTunes page. This information then becomes the
+                        basis for further interaction and data exchange within the project.
                     </p>
 
-                    <div class="mediaGrid">
-                        <figure class="figure">
-                            <img src="assets/a1/process01.jpg" alt="Process image 01">
-                            <figcaption class="caption">图注：这里写截图说明（如：first prototype）。</figcaption>
-                        </figure>
+                    <figure class="figure">
+                        <img src="01/freesound.png" alt="System diagram">
+                    </figure>
 
-                        <figure class="figure">
-                            <img src="assets/a1/process02.jpg" alt="Process image 02">
-                            <figcaption class="caption">图注：这里写截图说明（如：iteration / debug）。</figcaption>
-                        </figure>
-                    </div>
+                    <figure class="figure">
+                        <img src="01/itunes.png" alt="System diagram">
+                    </figure>
 
-                    <pre class="code"><code>// 代码片段（可选）
-// 只放最关键的几行，完整代码放 GitHub/链接
-function setup() {
-  createCanvas(640, 480);
-}</code></pre>
+                    <pre class="code-block"><code>
+triggerButton.addEventListener('click', () => {
+  mainContent.textContent = 'Loading...';
+  fetchRandomTrackWithRetry(0);
+});
+</code></pre>
+
+
+                    <p class="p">
+                        A single user action serves as the entry point of the system. A button click triggers a sequence
+                        of hidden processes, beginning with a loading state and followed by an API request.
+                    </p>
+
+                    <pre class="code-block"><code>
+const SEEDS = [
+  "jazz","lofi","ambient","piano","guitar","string quartet","electronic",
+  "hip hop","rock","pop","RnB","synth","orchestra","folk","blues","house",
+  "soundtrack","game","film","chill","beats","dub","trance","metal","acoustic"
+];
+
+const term = SEEDS[Math.floor(Math.random()*SEEDS.length)];
+</code></pre>
+
+                    <p class="p">
+
+                        A predefined list of sound-related keywords is used as a controlled input pool, from which one
+                        term is randomly selected to guide each API request.
+                    </p>
+
+                    <pre class="code-block"><code>
+const url = new URL('https://itunes.apple.com/search');
+url.searchParams.set('term', term);
+url.searchParams.set('media','music');
+url.searchParams.set('entity','musicTrack');
+url.searchParams.set('limit','50');
+url.searchParams.set('country','US');
+
+const res = await fetch(url.toString());
+const data = await res.json();
+</code></pre>
+
+                    <p class="p">
+
+                        The selected keyword is converted into a structured API request URL, sent to the server via a
+                        fetch call, and parsed from the returned JSON data for further processing.
+                    </p>
+
+                    <pre class="code-block"><code>
+${preview ? `&lt;audio controls src="\${preview}" type="audio/m4a"&gt;&lt;/audio&gt;` : ''}
+${source ? `&lt;a href="\${source}" target="_blank"&gt;iTunes/Apple Music page&lt;/a&gt;` : ''}
+</code></pre>
+
+                    <p class="p">
+
+                        The API response is translated from structured JSON data into visual text and playable sound,
+                        turning metadata into an interactive audiovisual interface.
+                    </p>
+
+                    <figure class="figure">
+                        <img src="01/test1.png" alt="System diagram">
+                    </figure>
+
+
+
+
+
+
                 </section>
 
                 <!-- Result -->
