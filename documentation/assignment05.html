@@ -30,7 +30,6 @@
                     <li><a href="#overview"><span>Overview</span><small>00</small></a></li>
                     <li><a href="#concept"><span>Concept</span><small>01</small></a></li>
                     <li><a href="#process"><span>Process</span><small>02</small></a></li>
-                    <li><a href="#result"><span>Result</span><small>03</small></a></li>
                     <li><a href="homepage.html"><span>← Back Home</span><small>↩</small></a></li>
                 </ul>
             </aside>
@@ -139,7 +138,7 @@ float height = ripple * decay * amp;
                             </figure>
 
                             <figure class="figure">
-                                <iframe src="https://www.youtube.com/embed/SsUm69c-l-Y" title="Shadertoy"
+                                <iframe src="https://www.youtube.com/embed/TzYf4VdYJD0" title="Shadertoy"
                                     allowfullscreen>
                                 </iframe>
 
@@ -156,7 +155,7 @@ float grooveFreq = mix(60.0, 140.0, mid);
                                 </figure>
 
                                 <figure class="figure">
-                                    <iframe src="https://www.youtube.com/embed/SsUm69c-l-Y" title="Shadertoy"
+                                    <iframe src="https://www.youtube.com/embed/Id5vxF9uh0g" title="Shadertoy"
                                         allowfullscreen>
                                     </iframe>
 
@@ -168,56 +167,226 @@ float rippleFreq= mix(14.0, 40.0, mid);
 float warpAmp   = mix(0.010, 0.050, low);
 </code></pre>
 
-<h2 class="h2">#5</h2>
-                                <figure class="figure">
-                                    <img src="05/05.png" alt="System diagram">
-                                </figure>
+                                    <h2 class="h2">#5</h2>
+                                    <figure class="figure">
+                                        <img src="05/05.png" alt="System diagram">
+                                    </figure>
 
-                                <figure class="figure">
-                                    <iframe src="https://www.youtube.com/embed/SsUm69c-l-Y" title="Shadertoy"
-                                        allowfullscreen>
-                                    </iframe>
+                                    <figure class="figure">
+                                        <iframe src="https://www.youtube.com/embed/LBlgdIOl25Y" title="Shadertoy"
+                                            allowfullscreen>
+                                        </iframe>
 
-                                    
+                                        <pre class="code-block"><code>
+float r = length(k);
+float a = atan(k.y, k.x);
+
+float rings  = sin((r + wob) * ringFreq * 6.2831853 - t*1.0);
+float spokes = sin((a)       * spokeFreq * 6.2831853 + t*0.3);
+
+float ringLine  = smoothstep(0.92, 1.00, abs(rings));
+float spokeLine = smoothstep(0.92, 1.00, abs(spokes));
+
+float pattern = max(ringLine, spokeLine);
+pattern = max(ringLine, stripeLine)
+</code></pre>
+                                        <h2 class="h2">#6</h2>
+                                        <figure class="figure">
+                                            <img src="05/06.png" alt="System diagram">
+                                        </figure>
+
+                                        <img src="05/Shadertoy06.gif" alt="System demo animation" class="doc-gif">
+
+                                            <pre class="code-block"><code>
+rings   = sin(...)
+stripes = sin(...)
+pattern = max(ringLine, stripeLine)
+</code></pre>
+
+                                            <h2 class="h2">#7</h2>
+                                            <figure class="figure">
+                                                <img src="05/07.png" alt="System diagram">
+                                            </figure>
+
+                                            <figure class="figure">
+                                                <iframe src="https://www.youtube.com/embed/Zd2lhNJVY8k"
+                                                    title="Shadertoy" allowfullscreen>
+                                                </iframe>
+
+                                                <p class="p">
+                                                    Instead of visualizing sound as a waveform or continuous motion,
+                                                    this project treats sound as a series of spatial events. Each sound
+                                                    leaves an imprint in space, expanding and fading over time. The
+                                                    image functions as a record of sonic pressure rather than a
+                                                    decorative pattern.
+                                                </p>
+
+                                                <pre class="code-block"><code>
+vec2 cell = floor(p*6.0);
+vec2 local = fract(p*6.0) - 0.5;
+</code></pre>
+
+
+                                                <h2 class="h2">#8</h2>
+                                                <figure class="figure">
+                                                    <img src="05/08.png" alt="System diagram">
+                                                </figure>
+
+                                                <img src="05/Shadertoy08.gif" alt="System demo animation" class="doc-gif">
+
+                                                    <pre class="code-block"><code>
+float waveSample(float x){
+    return texture(iChannel0, vec2(fract(x), 0.25)).r;
+}
+float fftSample(float x){
+    return texture(iChannel0, vec2(clamp(x, 0.0, 1.0), 0.75)).r;
+}
+</code></pre>
+
+                                                    <pre class="code-block"><code>
+float steps = mix(10.0, 26.0, bril);
+float contour = abs(fract(height*steps) - 0.5);
+float line = smoothstep(0.18, 0.02, contour);
+
+</code></pre>
+
+                                                    <h2 class="h2">#9</h2>
+                                                    <figure class="figure">
+                                                        <img src="05/09.png" alt="System diagram">
+                                                    </figure>
+
+                                                    <img src="05/ Shadertoy09.gif" alt="System demo animation" class="doc-gif">
+
+                                                        <p class="p">
+                                                            Inspired by Chladni patterns, this Shadertoy sketch uses
+                                                            real-time audio to simulate sound-driven nodal structures on
+                                                            a vibrating plate.
+                                                        </p>
+                                                        <pre class="code-block"><code>
+g = noise(p*120.0 + time*vec2(0.2,0.1));
+
+sand = smoothstep(0.6, 1.0, g) * (0.2 + 0.8*line);
+</code></pre>
+
+
+                                                        <h2 class="h2">#10</h2>
+                                                        <figure class="figure">
+                                                            <img src="05/10.png" alt="System diagram">
+                                                        </figure>
+
+                                                        <img src="05/Shadertoy10.gif" alt="System demo animation" class="doc-gif">
+
+                                                            <pre class="code-block"><code>
+vec4 prev = texture(iChannel0, uv);
+</code></pre>
+
+                                                            <h2 class="h2">#11</h2>
+                                                            <figure class="figure">
+                                                                <img src="05/11.png" alt="System diagram">
+                                                            </figure>
+
+                                                            <img src="05/ Shadertoy11.gif" alt="System demo animation" class="doc-gif">
+
+                                                                <pre class="code-block"><code>
+float lap = (sL + sR + sU + sD - 4.0*s);
+
+float diff  = mix(0.10, 0.45, low);
+float decay = 0.015;
+
+float baseline = 0.50;
+float nextS = s + (diff*lap - decay*(s - baseline));
+
+</code></pre>
+
+<h2 class="h2">#12</h2>
+                                                            <figure class="figure">
+                                                                <img src="05/12.png" alt="System diagram">
+                                                            </figure>
+
+                                                            <img src="05/Shadertoy12.gif" alt="System demo animation" class="doc-gif">
+
+                                                                <pre class="code-block"><code>
+float lap = (sL + sR + sU + sD - 4.0*s);
+
+float diff  = mix(0.10, 0.45, low);
+float decay = 0.015;
+
+float baseline = 0.50;
+float nextS = s + (diff*lap - decay*(s - baseline));
+
+</code></pre>
+
+
+<h2 class="h2">#13</h2>
+                                                            <figure class="figure">
+                                                                <img src="05/13.png" alt="System diagram">
+                                                            </figure>
+
+                                                            <img src="05/Shadertoy13.gif" alt="System demo animation" class="doc-gif">
+
+
+                                                                <pre class="code-block"><code>
+float r = length(p);
+float a = atan(p.y, p.x);
+
+</code></pre>
+
+<h2 class="h2">#14</h2>
+                                                            <figure class="figure">
+                                                                <img src="05/14.png" alt="System diagram">
+                                                            </figure>
+
+                                                            <img src="05/Shadertoy14.gif" alt="System demo animation" class="doc-gif">
+
+                                                                <pre class="code-block"><code>
+float low  = smoothstep(0.0, 0.6, fftSample(0.03));
+float mid  = smoothstep(0.0, 0.6, fftSample(0.12));
+float high = smoothstep(0.0, 0.6, fftSample(0.35));
+
+</code></pre>
+
+ <pre class="code-block"><code>
+float slices = 5.0 + floor(quant(low, 5.0) * 6.0);
+float nSides = 4.0 + floor(quant(mid, 6.0) * 8.0);
+int DEPTH = int(clamp(2.0 + floor(quant(low, 5.0) * 3.0), 2.0, 5.0));
+
+</code></pre>
+<h2 class="h2">#15</h2>
+                                                            <figure class="figure">
+                                                                <img src="05/15.png" alt="System diagram">
+                                                            </figure>
+
+                                                            <img src="05/Shadertoy15.gif" alt="System demo animation" class="doc-gif">
+
+                                                                <pre class="code-block"><code>
+vec3 cam = texture(iChannel0, uv).rgb;
+float lum = dot(cam, vec3(0.299, 0.587, 0.114));
+</code></pre>
 
 
 
 
 
-                </section>
-
-                <!-- Result -->
-                <section class="section" id="result">
-                    <h2 class="h2">Result</h2>
-                    <p class="p">
-                        This video shows a successful connection test of the Arduino system, demonstrating basic sensor
-                        input and system response before final integration.
-                    </p>
-
-                    <figure class="figure">
-                        <iframe src="https://www.youtube.com/embed/0Vk419v3q3k"
-                            title="Clay communication system documentation" allowfullscreen>
-                        </iframe>
-
-                        <figure class="figure">
-                            <img src="03/lasercut.png" alt="System diagram">
-                        </figure>
 
 
 
 
 
+
+
+
+
+
+
+
+
+            </main>
         </div>
-        </section>
 
-
-        </main>
-    </div>
-
-    <footer class="footer">
-        <div>© <span id="year"></span> Creative Technology 03</div>
-        <div>“Thank you Maxim”</div>
-    </footer>
+        <footer class="footer">
+            <div>© <span id="year"></span> Creative Technology 03</div>
+            <div>“Thank you Maxim”</div>
+        </footer>
     </div>
 
     <script>

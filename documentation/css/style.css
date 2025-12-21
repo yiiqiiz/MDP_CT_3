@@ -229,6 +229,14 @@ h1 {
   display: block;
 }
 
+.doc-gif {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 24px auto;
+  border: 0.5px solid rgba(0,0,0,0.6);
+}
+
 figcaption {
   font-size: 0.9em;
   color: #555;
