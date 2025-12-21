@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Codystar:wght@300;400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assignment 05 · Creative Technology 03</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div class="title">
+                <h1>ASSIGNMENT 05</h1>
+                <p class="subtitle">#Digital Materialities</p>
+            </div>
+
+            <div class="meta">
+                <div class="pill">Fall 2025 · MDP</div>
+                <div class="pill"><span id="studentName">Yiqi Zhang</span></div>
+            </div>
+        </header>
+
+        <div class="docLayout">
+            <!-- Left: TOC -->
+            <aside class="sidebar" aria-label="Table of contents">
+                <ul class="toc">
+                    <li><a href="#overview"><span>Overview</span><small>00</small></a></li>
+                    <li><a href="#concept"><span>Concept</span><small>01</small></a></li>
+                    <li><a href="#process"><span>Process</span><small>02</small></a></li>
+                    <li><a href="#result"><span>Result</span><small>03</small></a></li>
+                    <li><a href="homepage.html"><span>← Back Home</span><small>↩</small></a></li>
+                </ul>
+            </aside>
+
+            <!-- Right: Documentation -->
+            <main class="main" aria-label="Documentation content">
+
+                <!-- Overview -->
+                <section class="section" id="overview">
+                    <h2 class="h2">Overview</h2>
+                    <p class="p">
+                        This project explores sound-driven visual experiments using fragment shaders in Shadertoy.
+                        Instead of drawing shapes sequentially, each shader treats sound as data that influences every
+                        pixel simultaneously, mapping audio waveforms and FFT frequency information to color, movement,
+                        and distortion across the screen.
+                        <br><br>
+                        Through a series of 15–20 images, the project investigates different visual translations of
+                        sound—such as oscilloscope lines, spectrum bars, circular waves, and ripple-like surfaces—using
+                        shader logic to explore sound as vibration, rhythm, and spatial force. The work connects
+                        shader-based graphics with my thesis research on sound and material behavior, treating sound not
+                        as an overlay but as a generative structure.
+                    </p>
+
+                </section>
+
+                <!-- Concept -->
+                <section class="section" id="concept">
+                    <h2 class="h2">Concept</h2>
+                    <p class="p">
+                        Sound is treated not as an event over time, but as a field of vibration distributed across
+                        space. By using fragment shaders—where the same instruction runs simultaneously on every
+                        pixel—this project aligns sound’s continuous, wave-based nature with the parallel logic of GPU
+                        computation. Each image becomes a moment where sound modulates space, turning frequency,
+                        amplitude, and rhythm into visual tension, resonance, and flow rather than representation.
+                    </p>
+                    <figure class="figure">
+                        <img src="05/sound.jpeg " alt="System diagram">
+                    </figure>
+
+                </section>
+
+
+                <!-- Process -->
+                <section class="section" id="process">
+                    <h2 class="h2">Process</h2>
+                    <h2 class="h2">#1</h2>
+                    <figure class="figure">
+                        <img src="05/01.png" alt="System diagram">
+                    </figure>
+
+                    <figure class="figure">
+                        <iframe src="https://www.youtube.com/embed/SsUm69c-l-Y" title="Shadertoy" allowfullscreen>
+                        </iframe>
+
+                        <pre class="code-block"><code>
+float sampleWave(float x){
+    return texture(iChannel0, vec2(x, 0.25)).r;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+    vec2 uv = (fragCoord - 0.5*iResolution.xy)/iResolution.y;
+    float x = uv.x*0.5 + 0.5;
+    float w = sampleWave(fract(x));
+
+    float y = (w - 0.5) * 0.8;
+
+    float d = abs(uv.y - y);
+    float line = smoothstep(0.02, 0.0, d);
+    float glow = smoothstep(0.15, 0.0, d);
+
+    vec3 col = vec3(line) + vec3(0.2)*glow;
+    fragColor = vec4(col, 1.0);
+}
+</code></pre>
+
+
+                        <h2 class="h2">#2</h2>
+                        <figure class="figure">
+                            <img src="05/02.png" alt="System diagram">
+                        </figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        <p class="p">
+                            I was responsible for the weight-sensing system in the project. When I received the weight
+                            sensor, I found that it required a load cell amplifier (HX711) to function properly. Before
+                            any
+                            testing could take place, I first soldered the load cell wires to the HX711 amplifier,
+                            ensuring
+                            stable electrical connections. This step allowed the raw analog signals from the load cell
+                            to be
+                            amplified and read by the microcontroller, forming the foundation for weight detection and
+                            data
+                            transmission in the system.
+                        </p>
+
+
+
+
+
+
+                </section>
+
+                <!-- Result -->
+                <section class="section" id="result">
+                    <h2 class="h2">Result</h2>
+                    <p class="p">
+                        This video shows a successful connection test of the Arduino system, demonstrating basic sensor
+                        input and system response before final integration.
+                    </p>
+
+                    <figure class="figure">
+                        <iframe src="https://www.youtube.com/embed/0Vk419v3q3k"
+                            title="Clay communication system documentation" allowfullscreen>
+                        </iframe>
+
+                        <figure class="figure">
+                            <img src="03/lasercut.png" alt="System diagram">
+                        </figure>
+
+
+
+
+
+        </div>
+        </section>
+
+
+        </main>
+    </div>
+
+    <footer class="footer">
+        <div>© <span id="year"></span> Creative Technology 03</div>
+        <div>“Thank you Maxim”</div>
+    </footer>
+    </div>
+
+    <script>
+        document.getElementById('studentName').textContent = 'Yiqi Zhang';
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 可选：给目录点击增加平滑滚动（浏览器支持时生效）
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+
+</html>
