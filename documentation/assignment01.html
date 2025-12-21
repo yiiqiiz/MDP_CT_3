@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Codystar:wght@300;400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assignment 03 · Creative Technology 03</title>
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div class="title">
+                <h1>ASSIGNMENT 01</h1>
+                <p class="subtitle">#WWW as a Rube Goldberg machine</p>
+            </div>
+
+            <div class="meta">
+                <div class="pill">Fall 2025 · MDP</div>
+                <div class="pill"><span id="studentName">Yiqi Zhang</span></div>
+            </div>
+        </header>
+
+        <div class="docLayout">
+            <!-- Left: TOC -->
+            <aside class="sidebar" aria-label="Table of contents">
+                <ul class="toc">
+                    <li><a href="#overview"><span>Overview</span><small>00</small></a></li>
+                    <li><a href="#concept"><span>Concept</span><small>01</small></a></li>
+                    <li><a href="#process"><span>Process</span><small>02</small></a></li>
+                    <li><a href="#result"><span>Result</span><small>03</small></a></li>
+                    <li><a href="#reflection"><span>Reflection</span><small>04</small></a></li>
+                    <li><a href="homepage.html"><span>← Back Home</span><small>↩</small></a></li>
+                </ul>
+            </aside>
+
+            <!-- Right: Documentation -->
+            <main class="main" aria-label="Documentation content">
+
+                <!-- Overview -->
+                <section class="section" id="overview">
+                    <h2 class="h2">Overview</h2>
+                    <p class="p">
+                        This project treats the web as a chain of interconnected events rather than a single
+                        interaction. A user’s button click initiates a causal sequence across multiple platforms: a
+                        random song is first retrieved from iTunes, and key metadata such as the song’s title, genre,
+                        and lyrical keywords are then passed to the Freesound API to search for related sound effects.
+                        One sound is randomly selected and returned to the user.
+
+                        Instead of aiming for efficiency or accuracy, the project emphasizes indirection and dependency.
+                        Music data is translated into search terms, triggering a secondary system that produces an
+                        unexpected sonic outcome. Inspired by Rube Goldberg–like mechanisms, the work foregrounds the
+                        invisible exchanges, translations, and decisions that occur behind a single user action,
+                        celebrating the web as a playful network of chained requests and responses rather than a purely
+                        functional tool.
+                    </p>
+
+                </section>
+
+                <!-- Concept -->
+                <section class="section" id="concept">
+                    <h2 class="h2">Concept</h2>
+                    <p class="p">
+                        写你的概念/问题意识：你观察到了什么现象？你想让观众体验到什么？
+                    </p>
+                </section>
+
+                <!-- Process -->
+                <section class="section" id="process">
+                    <h2 class="h2">Process</h2>
+                    <p class="p">
+                        写制作过程（可以用小段落）。如果你想用列表，也可以直接写多个 &lt;p&gt;。
+                    </p>
+
+                    <div class="mediaGrid">
+                        <figure class="figure">
+                            <img src="assets/a1/process01.jpg" alt="Process image 01">
+                            <figcaption class="caption">图注：这里写截图说明（如：first prototype）。</figcaption>
+                        </figure>
+
+                        <figure class="figure">
+                            <img src="assets/a1/process02.jpg" alt="Process image 02">
+                            <figcaption class="caption">图注：这里写截图说明（如：iteration / debug）。</figcaption>
+                        </figure>
+                    </div>
+
+                    <pre class="code"><code>// 代码片段（可选）
+// 只放最关键的几行，完整代码放 GitHub/链接
+function setup() {
+  createCanvas(640, 480);
+}</code></pre>
+                </section>
+
+                <!-- Result -->
+                <section class="section" id="result">
+                    <h2 class="h2">Result</h2>
+                    <p class="p">
+                        这里放最终效果：可以是一张 hero 图、一个演示视频、或 GIF。
+                    </p>
+
+                    <div class="mediaGrid">
+                        <figure class="figure">
+                            <img src="assets/a1/final01.jpg" alt="Final result">
+                            <figcaption class="caption">最终效果（截图 / 渲染 / 现场照片）。</figcaption>
+                        </figure>
+
+                        <figure class="figure">
+                            <!-- 如果你是视频：把 img 换成 video -->
+                            <video controls src="assets/a1/demo.mp4"></video>
+                            <figcaption class="caption">Demo video（可选）。</figcaption>
+                        </figure>
+                    </div>
+                </section>
+
+                <!-- Reflection -->
+                <section class="section" id="reflection">
+                    <h2 class="h2">Reflection</h2>
+                    <p class="p">
+                        写 3-6 条反思：什么有效？什么无效？如果有更多时间你会怎么做？
+                    </p>
+                </section>
+
+                <!-- Links -->
+                <section class="section" id="links">
+                    <h2 class="h2">Links</h2>
+                    <p class="p">
+                        <a class="link" href="https://github.com/yourname/yourrepo" target="_blank"
+                            rel="noopener">GitHub Repo</a>
+                        ·
+                        <a class="link" href="https://editor.p5js.org/yourname/sketches/xxxx" target="_blank"
+                            rel="noopener">p5.js Sketch</a>
+                    </p>
+                </section>
+
+            </main>
+        </div>
+
+        <footer class="footer">
+            <div>© <span id="year"></span> Creative Technology 03</div>
+            <div>“Thank you Maxim”</div>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('studentName').textContent = 'Yiqi Zhang';
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // 可选：给目录点击增加平滑滚动（浏览器支持时生效）
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
+</body>
+
+</html>

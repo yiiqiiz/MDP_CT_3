@@ -1,145 +1,283 @@
 <!doctype html>
 <html lang="zh-CN">
+
 <head>
-  <meta charset="utf-8" />
-  <link href="https://fonts.googleapis.com/css2?family=Codystar:wght@300;400&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Assignment 03 · Creative Technology 03</title>
-  <link rel="stylesheet" href="css/style.css" />
+    <meta charset="utf-8" />
+    <link href="https://fonts.googleapis.com/css2?family=Codystar:wght@300;400&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Assignment 03 · Creative Technology 03</title>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>ASSIGNMENT 03</h1>
-        <p class="subtitle">#Synthetic Relationships</p>
-      </div>
+    <div class="wrap">
+        <header>
+            <div class="title">
+                <h1>ASSIGNMENT 03</h1>
+                <p class="subtitle">#Synthetic Relationships</p>
+            </div>
 
-      <div class="meta">
-        <div class="pill">Fall 2025 · MDP</div>
-        <div class="pill"><span id="studentName">Yiqi Zhang</span></div>
-      </div>
-    </header>
+            <div class="meta">
+                <div class="pill">Fall 2025 · MDP</div>
+                <div class="pill"><span id="studentName">Yiqi Zhang</span></div>
+            </div>
+        </header>
 
-    <div class="docLayout">
-      <!-- Left: TOC -->
-      <aside class="sidebar" aria-label="Table of contents">
-        <ul class="toc">
-          <li><a href="#overview"><span>Overview</span><small>00</small></a></li>
-          <li><a href="#concept"><span>Concept</span><small>01</small></a></li>
-          <li><a href="#process"><span>Process</span><small>02</small></a></li>
-          <li><a href="#result"><span>Result</span><small>03</small></a></li>
-          <li><a href="#reflection"><span>Reflection</span><small>04</small></a></li>
-          <li><a href="homepage.html"><span>← Back Home</span><small>↩</small></a></li>
-        </ul>
-      </aside>
+        <div class="docLayout">
+            <!-- Left: TOC -->
+            <aside class="sidebar" aria-label="Table of contents">
+                <ul class="toc">
+                    <li><a href="#overview"><span>Overview</span><small>00</small></a></li>
+                    <li><a href="#concept"><span>Concept</span><small>01</small></a></li>
+                    <li><a href="#moodboard"><span>Moodboard</span><small>02</small></a></li>
+                    <li><a href="#process"><span>Process</span><small>03</small></a></li>
+                    <li><a href="#result"><span>Result</span><small>04</small></a></li>
+                </ul>
+            </aside>
 
-      <!-- Right: Documentation -->
-      <main class="main" aria-label="Documentation content">
+            <!-- Right: Documentation -->
+            <main class="main" aria-label="Documentation content">
 
-        <!-- Overview -->
-        <section class="section" id="overview">
-          <h2 class="h2">Overview</h2>
-          <p class="p">
-            这里写作业一句话总结：你做了什么、为什么做、最终交付是什么。
-          </p>
+                <!-- Overview -->
+                <section class="section" id="overview">
+                    <h2 class="h2">Overview</h2>
+                    <p class="p">
+                        Our project explores communication as a material and embodied process by treating clay as an
+                        active participant in a networked exchange. We built two “electronic beings” around clay, each
+                        equipped with sensors that define its unique worldview. One side perceives weight, using a load
+                        cell to sense the presence and pressure of clay; the other perceives moisture, using a humidity
+                        sensor to register changes in the clay’s condition.
+                        <br><br>
+                        These two systems communicate through Adafruit IO. When clay is placed on the weighing sensor,
+                        the weight data is uploaded and transmitted across the network, triggering an LED response on
+                        the other side. In return, when water is added and the clay reaches a certain humidity
+                        threshold, that data is sent back, activating a servo motor that begins to rotate—symbolizing
+                        the start of the throwing wheel.
+                        <br><br>
+                        Rather than exchanging human-readable language, the two systems communicate through translated
+                        material states: pressure becomes light, moisture becomes motion. This closed, internally
+                        coherent system demonstrates how meaning can emerge from sensor data, encoding and decoding
+                        environmental conditions into actions that only fully make sense within the logic of the system
+                        itself.
+                    </p>
 
-          <div class="kv" role="list" aria-label="Key info">
-            <div role="listitem">Tools</div><div role="listitem">p5.js / ml5.js / Arduino / etc.</div>
-            <div role="listitem">Keywords</div><div role="listitem">keyword1, keyword2, keyword3</div>
-            <div role="listitem">Time</div><div role="listitem">Week X</div>
-          </div>
+                </section>
+
+                <!-- Concept -->
+                <section class="section" id="concept">
+                    <h2 class="h2">Concept</h2>
+                    <p class="p">
+                        This project explores communication as a material and posthuman process by constructing two
+                        electronic beings whose understanding of the world is defined by what they can sense. Built
+                        around clay, one system perceives weight and pressure, while the other perceives moisture and
+                        humidity. These sensory readings are transmitted through a shared network, where data is
+                        encoded, exchanged, and decoded into physical responses—light and motion—forming a closed loop
+                        of communication. Rather than using human-readable language, the systems communicate through
+                        translated material states, where changes in clay become meaningful signals within the system
+                        itself. Clay is treated not as a passive medium but as an active participant whose physical
+                        conditions directly shape the behavior of the network. In this way, the project reimagines
+                        communication and archiving as a live, relational process, where meaning emerges through
+                        continuous sensing, translation, and response rather than static representation.
+                    </p>
+                    <figure class="figure">
+                        <img src="03/concept.png" alt="System diagram">
+                    </figure>
+
+                </section>
+
+                <!-- Moodboard -->
+                <section class="section" id="moodboard">
+                    <h2 class="h2">Moodboard</h2>
+                    <figure class="figure">
+                        <img src="03/moodboard.png" alt="System diagram">
+                    </figure>
+
+                </section>
+
+
+                <!-- Process -->
+                <section class="section" id="process">
+                    <h2 class="h2">Process</h2>
+                    <figure class="figure">
+                        <img src="03/sketch.png" alt="System diagram">
+                    </figure>
+
+                    <p class="p">
+                        I was responsible for the weight-sensing system in the project. When I received the weight
+                        sensor, I found that it required a load cell amplifier (HX711) to function properly. Before any
+                        testing could take place, I first soldered the load cell wires to the HX711 amplifier, ensuring
+                        stable electrical connections. This step allowed the raw analog signals from the load cell to be
+                        amplified and read by the microcontroller, forming the foundation for weight detection and data
+                        transmission in the system.
+                    </p>
+
+                    <figure class="figure">
+                        <img src="03/hx711.png" alt="System diagram">
+                    </figure>
+
+                    <p class="p">
+                        This was my first time attempting soldering, so the connections were not very stable at first. I
+                        reinforced the joints twice to improve reliability. For my next iteration, I plan to use pin
+                        headers (male pins with female jumper wires) instead, which will make the connections more
+                        stable and easier to modify.
+                    </p>
+
+                    <figure class="figure">
+                        <img src="03/arduino.png" alt="System diagram">
+                    </figure>
+
+                    <pre class="code-block"><code>
+#include "HX711.h"
+
+#define DT_PIN 4
+#define SCK_PIN 5
+
+HX711 scale;
+
+void setup() {
+  Serial.begin(115200);
+  scale.begin(DT_PIN, SCK_PIN);
+
+  Serial.println("HX711 test...");
+
+  delay(1000);
+
+  if (!scale.is_ready()) {
+    Serial.println("HX711 not found.");
+    while (1);
+  }
+
+  Serial.println("HX711 ready.");
+}
+
+void loop() {
+  if (scale.is_ready()) {
+    long reading = scale.read();
+    Serial.print("Raw reading: ");
+    Serial.println(reading);
+  } else {
+    Serial.println("HX711 not ready");
+  }
+
+  delay(200);
+}
+</code></pre>
+
+                    <p class="p">
+                        After completing the wiring, I wrote a simple test sketch to verify that the HX711 and the load
+                        cell were functioning correctly.
+                    </p>
+
+                    <pre class="code-block"><code>
+AdafruitIO_Feed *myfeed    = io.feed("creatureA");                        
+AdafruitIO_Feed *otherfeed = io.feed("6364", "IrisXu");
+</code></pre>
+
+                    <figure class="figure">
+                        <img src="03/adafruitio.png" alt="System diagram">
+                    </figure>
+
+                    <p class="p">
+                        During the process of uploading and receiving data, we identified two important points to pay
+                        attention to: (1) making sure the feed is set to public, and (2) ensuring that the feed name is
+                        entered correctly, including matching capitalization. An incorrect feed name was the main reason
+                        we initially failed to receive data from the other system.
+                    </p>
+
+
+                    <pre class="code-block"><code>
+long raw = scale.read_average(10);    
+long net = raw - tareValue;
+float w  = net / calibrationFactor;   
+</code></pre>
+
+                    <p class="p">
+                        This section reads raw data from the HX711 load cell amplifier and converts it into a calibrated
+                        weight value. The system averages multiple sensor readings to reduce noise, subtracts the
+                        previously recorded tare value to remove the baseline, and applies a calibration factor to
+                        translate the result into weight measured in grams.
+                    </p>
+
+                    <pre class="code-block"><code>
+io.run();
+float weight = readWeight();
+myfeed->save(weight);
+</code></pre>
+
+                    <p class="p">
+                        Translate sensory input into networked messages.
+                    </p>
+
+
+                    <pre class="code-block"><code>
+if (data->toInt() > 2000) other_value = true;
+else other_value = false;
+</code></pre>
+
+                    <p class="p">
+                        Interpret incoming data and convert it into a system state
+                    </p>
+
+                    <pre class="code-block"><code>
+if (other_value && weight > 50.0) {
+  // servo sweep
+} else {
+  myServo.write(0);
+}
+</code></pre>
+
+                    <p class="p">
+                        The servo is activated only when both local sensor data and the received system state meet
+                        predefined conditions.
+                    </p>
+
+
+
+
+
+                </section>
+
+                <!-- Result -->
+                <section class="section" id="result">
+                    <h2 class="h2">Result</h2>
+                    <p class="p">
+                        This video shows a successful connection test of the Arduino system, demonstrating basic sensor
+                        input and system response before final integration.
+                    </p>
+
+                    <figure class="figure">
+                        <iframe src="https://www.youtube.com/embed/0Vk419v3q3k"
+                            title="Clay communication system documentation" allowfullscreen>
+                        </iframe>
+
+                        <figure class="figure">
+                            <img src="03/lasercut.png" alt="System diagram">
+                        </figure>
+
+
+
+
+
+        </div>
         </section>
 
-        <!-- Concept -->
-        <section class="section" id="concept">
-          <h2 class="h2">Concept</h2>
-          <p class="p">
-            写你的概念/问题意识：你观察到了什么现象？你想让观众体验到什么？
-          </p>
-        </section>
 
-        <!-- Process -->
-        <section class="section" id="process">
-          <h2 class="h2">Process</h2>
-          <p class="p">
-            写制作过程（可以用小段落）。如果你想用列表，也可以直接写多个 &lt;p&gt;。
-          </p>
-
-          <div class="mediaGrid">
-            <figure class="figure">
-              <img src="assets/a1/process01.jpg" alt="Process image 01">
-              <figcaption class="caption">图注：这里写截图说明（如：first prototype）。</figcaption>
-            </figure>
-
-            <figure class="figure">
-              <img src="assets/a1/process02.jpg" alt="Process image 02">
-              <figcaption class="caption">图注：这里写截图说明（如：iteration / debug）。</figcaption>
-            </figure>
-          </div>
-
-          <pre class="code"><code>// 代码片段（可选）
-// 只放最关键的几行，完整代码放 GitHub/链接
-function setup() {
-  createCanvas(640, 480);
-}</code></pre>
-        </section>
-
-        <!-- Result -->
-        <section class="section" id="result">
-          <h2 class="h2">Result</h2>
-          <p class="p">
-            这里放最终效果：可以是一张 hero 图、一个演示视频、或 GIF。
-          </p>
-
-          <div class="mediaGrid">
-            <figure class="figure">
-              <img src="assets/a1/final01.jpg" alt="Final result">
-              <figcaption class="caption">最终效果（截图 / 渲染 / 现场照片）。</figcaption>
-            </figure>
-
-            <figure class="figure">
-              <!-- 如果你是视频：把 img 换成 video -->
-              <video controls src="assets/a1/demo.mp4"></video>
-              <figcaption class="caption">Demo video（可选）。</figcaption>
-            </figure>
-          </div>
-        </section>
-
-        <!-- Reflection -->
-        <section class="section" id="reflection">
-          <h2 class="h2">Reflection</h2>
-          <p class="p">
-            写 3-6 条反思：什么有效？什么无效？如果有更多时间你会怎么做？
-          </p>
-        </section>
-
-        <!-- Links -->
-        <section class="section" id="links">
-          <h2 class="h2">Links</h2>
-          <p class="p">
-            <a class="link" href="https://github.com/yourname/yourrepo" target="_blank" rel="noopener">GitHub Repo</a>
-            ·
-            <a class="link" href="https://editor.p5js.org/yourname/sketches/xxxx" target="_blank" rel="noopener">p5.js Sketch</a>
-          </p>
-        </section>
-
-      </main>
+        </main>
     </div>
 
     <footer class="footer">
-      <div>© <span id="year"></span> Creative Technology 03</div>
-      <div>“Thank you Maxim”</div>
+        <div>© <span id="year"></span> Creative Technology 03</div>
+        <div>“Thank you Maxim”</div>
     </footer>
-  </div>
+    </div>
 
-  <script>
-    document.getElementById('studentName').textContent = 'Yiqi Zhang';
-    document.getElementById('year').textContent = new Date().getFullYear();
+    <script>
+        document.getElementById('studentName').textContent = 'Yiqi Zhang & Iris Xu';
+        document.getElementById('year').textContent = new Date().getFullYear();
 
-    // 可选：给目录点击增加平滑滚动（浏览器支持时生效）
-    document.documentElement.style.scrollBehavior = 'smooth';
-  </script>
+        // 可选：给目录点击增加平滑滚动（浏览器支持时生效）
+        document.documentElement.style.scrollBehavior = 'smooth';
+    </script>
 </body>
+
 </html>
